@@ -76,6 +76,26 @@ def discard_all_but_one_relays_which_share_address(relays_src):
             addr_hash[addr] = 1
     return relays_dst
 
+
+def obfuscate_address(addr):
+    if "." in addr:
+        part = addr.split(".")
+        return f"{part[0]}.{part[1]}.x.x"
+    if ":" in addr:
+        sub = addr[:9]
+        return f"{sub}..."
+    return "xx"
+
+def obfuscate_address_in_results(results_orig):
+    results = []
+    for result_orig in results_orig:
+        result = copy.deepcopy(result_orig)
+        result["address"] = obfuscate_address(result["address"])
+        if "host" in result["ping_result"]:
+            result["ping_result"]["host"] = obfuscate_address(result["ping_result"]["host"])
+        results.append(result)
+    return results
+ 
 if __name__ == "__main__":
     VERBOSE_ERROR=0
     VERBOSE_INFO=1
@@ -90,6 +110,7 @@ if __name__ == "__main__":
     parser.add_argument("--dst-file", default="ping_results.json", help="output file: results of cncli ping")
     parser.add_argument("--dry-run", action="store_true", default=False, help="run, but don't ping anything. Output file will be empty.")
     parser.add_argument("--unique-ip", action="store_true", default=False, help="ping each unique address only once, even if multiple relays share the address")
+    parser.add_argument("--obfuscate-ip", action="store_true", default=False, help="obfuscate IP addresses in output file")
     parser.add_argument("--verbose", action="count", default=default_verbose, help="increase verbosity")
     param = parser.parse_args()
     results = []
@@ -118,6 +139,8 @@ if __name__ == "__main__":
                     print(result)
                 results.append(result)
         results = sort_relays(results)
+        if param.obfuscate_ip:
+            results = obfuscate_address_in_results(results)
         with open(param.dst_file, "w") as outfile:
             json.dump(results, outfile)
             if param.verbose >= VERBOSE_INFO:
