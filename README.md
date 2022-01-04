@@ -5,6 +5,6 @@
 
 Theia is a tool to monitor Cardano stake pool relays, as registered on the blockchain. 
 
-`[cncli](https://github.com/AndrewWestberg/cncli) ping` is used to determine if each relay is online and running
+[cncli](https://github.com/AndrewWestberg/cncli) ping is used to determine if each relay is online and running
 a recent version of the Cardano protocol. 
 
