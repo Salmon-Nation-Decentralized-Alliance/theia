@@ -12,8 +12,8 @@ Finally we can ping the relays
 
     python3 ping_relay.py --src-url file:///$(pwd)/relay.json
 
-The python scripts take a file URL as input. The file is opened using the
-[urllib library|https://docs.python.org/3/library/urllib.html]; any URL supported by urllib should, including: 
+[urllib](https://docs.python.org/3/library/urllib.html) is used to open the
+input files; any URL supported by urllib should work, including: 
 
   - file://
   - http://
