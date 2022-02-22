@@ -11,12 +11,13 @@ import threading
 import time
 from urllib.request import urlopen
 
+
 def cncli_ping(address, port, magic, timeout):
     try:
         #print(f"PING: {address}:{port}  magic {magic} ")
-        result = subprocess.run(["/usr/local/bin/cncli", "ping", "--host", f"{address}", "--port", f"{port}", "--network-magic", f"{magic}"], stdout=subprocess.PIPE, timeout=timeout)
+        result = subprocess.run(["cncli", "ping", "--host", f"{address}", "--port", f"{port}", "--network-magic", f"{magic}"], stdout=subprocess.PIPE, timeout=timeout)
         if result.returncode == 0:
-            text = result.stdout
+            text = result.stdout.decode("utf-8")
             return json.loads(text)
         return {
             "status": "error", 
@@ -37,6 +38,7 @@ def ping_relay(relay, timeout):
     port = relay["port"]
     magic = relay["network_magic"]
     ping_result = cncli_ping(address, port, magic, timeout)
+    ping_result["timestamp"] = int(time.time())
     enriched = copy.deepcopy(relay)
     enriched["ping_result"] = ping_result 
     return enriched
@@ -95,19 +97,28 @@ def obfuscate_address_in_results(results_orig):
             result["ping_result"]["host"] = obfuscate_address(result["ping_result"]["host"])
         results.append(result)
     return results
- 
+
+def get_cncli_version():
+    result = subprocess.run(["cncli", "--version"], stdout=subprocess.PIPE, timeout=10)
+    if result.returncode == 0:
+        return result.stdout.decode("utf-8").strip()
+    raise Exception("Error running cncli. " + result.stdout)
+
 if __name__ == "__main__":
     VERBOSE_ERROR=0
     VERBOSE_INFO=1
     VERBOSE_DEBUG=2
     default_verbose = VERBOSE_ERROR
-    parser = argparse.ArgumentParser(description="Ping Pool - part of the Cardano Pool Reachability Dashboard (CardBoard) project")
-    parser.add_argument("--version", action="version", version="1.0")
+    cncli_version=get_cncli_version()
+    ping_relay_version = "1.0" # this script's version
+    parser = argparse.ArgumentParser(description="Ping Pool - part of the Cardano Pool Reachability Dashboard (CardBoard) project") 
+    parser.add_argument("--version", action="version", version=ping_relay_version)
     parser.add_argument("--threads", type=int, default=100, help="max number of concurrent ping processes")
     parser.add_argument("--timeout", type=int, default=10, help="timeout (in seconds) to wait for cncli ping to complete, per relay")
     parser.add_argument("--src-url", required=True, help="URL of input file containing list of all relays, in JSON. EG: file:///path/to/relay.json")
     # TODO: support writing to S3
     parser.add_argument("--dst-file", default="ping_results.json", help="output file: results of cncli ping")
+    parser.add_argument("--ping-location", default="unknown", help="location of ping client; added as metadata to output file")
     parser.add_argument("--dry-run", action="store_true", default=False, help="run, but don't ping anything. Output file will be empty.")
     parser.add_argument("--unique-ip", action="store_true", default=False, help="ping each unique address only once, even if multiple relays share the address")
     parser.add_argument("--obfuscate-ip", action="store_true", default=False, help="obfuscate IP addresses in output file")
@@ -141,8 +152,19 @@ if __name__ == "__main__":
         results = sort_relays(results)
         if param.obfuscate_ip:
             results = obfuscate_address_in_results(results)
+        output_data = {
+            "file_type": "cardano_stake_pool_ping_results",
+            "version": "1.0",
+            "timestamp": int(time.time()),
+            "ping_location": param.ping_location,
+            "unique_ip": param.unique_ip, 
+            "obfuscate_ip": param.obfuscate_ip,
+            "cncli_version": cncli_version,
+            "ping_relay_version": ping_relay_version,
+            "ping_results": results
+        }
         with open(param.dst_file, "w") as outfile:
-            json.dump(results, outfile)
+            json.dump(output_data, outfile)
             if param.verbose >= VERBOSE_INFO:
                 print(f"{len(results)} ping results written to '{param.dst_file}'")
     time_end = time.time()

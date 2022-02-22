@@ -1,0 +1,32 @@
+{
+  "name": "theia",
+  "description": "Cardano Stake Pool Reachability Dashboard",
+  "version": "1.0.0",
+  "author": "Theia",
+  "license": "MIT",
+  "homepage": "https://github.com/Salmon-Nation-Decentralized-Alliance/theia/dashboard/README.md",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src/*.js src/*.html -d dist",
+    "start": "npm run build && nodemon dist/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Salmon-Nation-Decentralized-Alliance/theia.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Salmon-Nation-Decentralized-Alliance/theia/dashboard/issues"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.5",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "current": "^0.1.6",
+    "npm": "^8.5.1"
+  }
+}
