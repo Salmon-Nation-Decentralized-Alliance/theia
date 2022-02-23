@@ -1,6 +1,6 @@
 # Setup Node
 
-If you have a working install of node + babel, you don't have to do this. 
+If you have a recent, working install of node + npm + babel, you may not have to do this. 
 
 If your node version is out of date, or you don't feel like using the OS-installed node, 
 perhaps this is useful. For programs like node, I prefer to use a local install 
@@ -30,11 +30,17 @@ so that updates are easier and not tied to my OS.
     # Or, if you want the latest goodness
     npm update
 
-5. Build 
+As a side note: this project was started with `npx create-react-app theia` and modified. 
 
-    make
-    
-    # Or, if you prefer to build individual files manually... run something like this:
-    npx babel src/BasicStatus.js -o dist/BasicStatus.js
+# Run the Dashboard Locally
 
+    npm start
+    # your browser should auto-open to http://localhost:3000
+
+# Build for Production
+
+    npm run build
+    # upload everything in the build/ directory to your web server.
+    # NOTE: The application's path is assumed to be '/'. If this is not accurate, update
+    # the 'homepage' field in package.json
 
