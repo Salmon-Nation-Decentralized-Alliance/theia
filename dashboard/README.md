@@ -10,9 +10,9 @@ so that updates are easier and not tied to my OS.
 1. Download nodejs from https://nodejs.org and un-tar it somewhere
 
     cd my/local/spot
-    wget https://nodejs.org/dist/v17.5.0/node-v17.5.0-linux-x64.tar.xz
-    xz --decompress node-v17.5.0-linux-x64.tar.xz 
-    tar xvf node-v17.5.0-linux-x64.tar 
+    wget https://nodejs.org/dist/vXX.X.X/node-vXX.X.X-linux-x64.tar.xz
+    xz --decompress node-vXX.X.X-linux-x64.tar.xz 
+    tar xvf node-vXX.X.X-linux-x64.tar 
 
 2. Add the node-vXX.X.X-linux-x64/bin/ directory to your path (or equivalent)
 
