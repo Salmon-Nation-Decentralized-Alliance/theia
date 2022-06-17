@@ -1,6 +1,6 @@
 //import configData from './pool.json';
-
 import React from 'react';
+import { Version } from './Version';
 
 class BasicStatus extends React.Component {
   constructor(props) {
@@ -8,13 +8,15 @@ class BasicStatus extends React.Component {
 
     this.state={};
     this.state.updateActive=false;
-    this.state.updateInterval=1000; // ms
+    this.state.updateInterval=2000; // milliseconds
 
-    this.state.pingCurrentIdx=0; 
-    this.state.pingUrls=props.results
-    props.results.forEach(ping => {
-      this.setState({ping: {}});
-    })
+    this.state.pingResultSources=props.pingResultSources;
+    this.state.pingResultCurrentIdx=0; 
+    let pingResults = {};
+    props.pingResultSources.forEach(pingResultSource => {
+      pingResults[pingResultSource.id] = {};
+    });
+    this.state.pingResults = pingResults;
 
     this.activateUpdate = this.activateUpdate.bind(this);
     this.deactivateUpdate = this.deactivateUpdate.bind(this);
@@ -59,8 +61,8 @@ class BasicStatus extends React.Component {
       console.log("AJAX: waiting for response from previous reqeust");
       return;
     }
-    let idx=this.state.pingCurrentIdx;
-    let url=this.state.pingUrls[idx];
+    let idx=this.state.pingResultCurrentIdx;
+    let url=this.state.pingResultSources[idx].url;
     this.requestIsInFlight = true;
     this.request.open("GET", url, true);
     this.request.send();
@@ -70,43 +72,45 @@ class BasicStatus extends React.Component {
     console.log("Theia restarted");
   }
 
-//    this.state.pingCurrentIdx=0; 
-//    this.state.pingUrls=props.results
-//    props.results.forEach(ping => {
-//      this.state[ping] = {}
-//    }
-
   handleConnectionStateUpdate() {
-    let idx=this.state.pingCurrentIdx;
+    let idx=this.state.pingResultCurrentIdx;
+    let pingResultSource = this.state.pingResultSources[idx];
     let nextIdx = idx + 1;
-    if (nextIdx >= this.state.pingUrls.length) {
+    if (nextIdx >= this.state.pingResultSources.length) {
       nextIdx = 0;
     }
-    let url=this.state.pingUrls[idx];
+    //console.log("readyState = " + this.request.readyState + "  status = " + this.request.status);
+    //console.log(this.request);
     if (this.request.readyState === 4) {
       this.requestIsInFlight = false;
-    }
-    if (this.request.readyState === 4 && this.request.status === 202) {
-      //console.log(this.request);
+    } 
+    if (this.request.readyState === 4 && this.request.status === 200) {
       if (this.state.updateActive) { 
-        let parsedResult=JSON.parse(this.request.responseText);
-        console.log("Updating state... ");
-        let update = {
-          pingCurrentIdx: nextIdx
+        //console.log("Updating state... ");
+        let parsedResult = {};
+        try {
+          parsedResult = JSON.parse(this.request.responseText);
+        } catch(err) {
+          console.log("Error parsing JSON for pingResultSource " + pingResultSource.id + " (" + pingResultSource.name + ")");
+          console.log(err);
         }
-        update[url]=parsedResult
+        let pingResults = this.state.pingResults;
+        pingResults[pingResultSource.id]=parsedResult;
+        let update = { 
+          "pingResultCurrentIdx": nextIdx,
+          "pingResults": pingResults
+        };
         this.setState(update);
       }
     }
   }
 
   render() {
-
     return (
       <div>
         <h1><img src={process.env.PUBLIC_URL + "/theia.png"} alt="Theia" />Theia</h1>
-        <p><small><small>Version X built on X <a href="https://github.com/Salmon-Nation-Decentralized-Alliance/Theia">Source</a></small></small></p>
-        <p>Result set {this.state.pingCurrentIdx}: {this.state.pingUrls[this.state.pingCurrentIdx]}</p>
+        <Version />
+        <p>Result set {this.state.pingResultCurrentIdx}: {this.state.pingResultSources[this.state.pingResultCurrentIdx].url}</p>
       </div>
     );
   }

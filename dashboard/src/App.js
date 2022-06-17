@@ -2,23 +2,20 @@ import './App.css';
 import { BasicStatus } from './BasicStatus';
 
 function App() {
-  let result_urls = [ 'ping_results.json', 'ping_results.json' ]
+  // We gather multiple ping_results created by multiple nodes throughout the internet. 
+  // The idea: by having more than one view of each relays, we can detect
+  // if some relays are reachable by some parts of the network, but unreachable 
+  // from other parts of the network. 
+  // TODO: the following list of ping_result URLs should come from a config file, 
+  // dynamically loaded and updated in real-time, or something?
+  let pingResultSources = [ 
+     { "id": 1, "name": "Sweden", "url": "theia/example_ping_results_1.json" }, 
+     { "id": 2, "name": "Brazil", "url": "theia/example_ping_results_2.json" },
+     { "id": 3, "name": "Japan",  "url": "theia/example_ping_results_3.json" }
+  ];
   return (
     <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-      <BasicStatus results={result_urls} />
+      <BasicStatus pingResultSources={pingResultSources} />
     </div>
   );
 }

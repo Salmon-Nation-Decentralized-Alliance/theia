@@ -1,0 +1,65 @@
+{
+  "file_type": "cardano_stake_pool_ping_results",
+  "version": "1.0",
+  "timestamp": 1645462006,
+  "ping_location": "Brazil",
+  "unique_ip": false,
+  "obfuscate_ip": false,
+  "cncli_version": "cncli 4.0.4",
+  "ping_relay_version": "1.0",
+  "ping_results": [
+    {
+      "publicKey": "1728930728917489327489327489372849372894732897489abcdeff",
+      "port": 6000,
+      "address": "0.0.0.0",
+      "name": "Bad Demo 1",
+      "description": "Demo 1 pool",
+      "homepage": "https://google.com",
+      "ticker": "DEMO1",
+      "network_magic": 764824073,
+      "ping_result": {
+        "status": "error",
+        "host": "0.0.0.0",
+        "port": 6000,
+        "errorMessage": "Connection refused (os error 111)",
+        "timestamp": 1645461981
+      }
+    },
+    {
+      "publicKey": "2728930728917489327489327489372849372894732897489abcdeff",
+      "port": 3001,
+      "address": "192.168.1.1",
+      "name": "ADAwesome",
+      "description": "ADAwesome Stake Pool!",
+      "homepage": "https://www.google.com",
+      "ticker": "AWE",
+      "network_magic": 764824073,
+      "ping_result": {
+        "status": "ok",
+        "host": "192.168.1.1",
+        "port": 3001,
+        "connectDurationMs": 556,
+        "durationMs": 605,
+        "timestamp": 1645461958
+      }
+    },
+    {
+      "publicKey": "3728930728917489327489327489372849372894732897489abcdeff",
+      "port": 3001,
+      "address": "192.168.1.2",
+      "name": "Big Pool",
+      "description": "Big Pool",
+      "homepage": "https://www.google.com",
+      "ticker": "BIG",
+      "network_magic": 764824073,
+      "ping_result": {
+        "status": "ok",
+        "host": "192.168.1.2",
+        "port": 3001,
+        "connectDurationMs": 100,
+        "durationMs": 305,
+        "timestamp": 1645461958
+      }
+    }
+  ]
+}
