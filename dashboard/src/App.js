@@ -1,5 +1,6 @@
 import './App.css';
 import { BasicStatus } from './BasicStatus';
+import { Version } from './Version';
 
 function App() {
   // We gather multiple ping_results created by multiple nodes throughout the internet. 
@@ -15,6 +16,8 @@ function App() {
   ];
   return (
     <div className="App">
+      <h1><img width="50" height="50" src={process.env.PUBLIC_URL + "/theia.png"} alt="Theia" />&nbsp;&nbsp;&nbsp;Theia</h1>
+      <Version />
       <BasicStatus pingResultSources={pingResultSources} />
     </div>
   );

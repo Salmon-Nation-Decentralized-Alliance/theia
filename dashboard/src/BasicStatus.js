@@ -1,6 +1,5 @@
-//import configData from './pool.json';
 import React from 'react';
-import { Version } from './Version';
+import { ResultHeader, ResultRow } from './Result';
 
 class BasicStatus extends React.Component {
   constructor(props) {
@@ -10,13 +9,13 @@ class BasicStatus extends React.Component {
     this.state.updateActive=false;
     this.state.updateInterval=2000; // milliseconds
 
-    this.state.pingResultSources=props.pingResultSources;
     this.state.pingResultCurrentIdx=0; 
     let pingResults = {};
     props.pingResultSources.forEach(pingResultSource => {
       pingResults[pingResultSource.id] = {};
     });
     this.state.pingResults = pingResults;
+    this.state.poolIndex = {};
 
     this.activateUpdate = this.activateUpdate.bind(this);
     this.deactivateUpdate = this.deactivateUpdate.bind(this);
@@ -27,7 +26,6 @@ class BasicStatus extends React.Component {
     this.request.onreadystatechange = this.handleConnectionStateUpdate;
     this.requestIsInFlight=false; 
     this.requestIntervalId=null;
-
   }
 
   componentDidMount() {
@@ -62,7 +60,7 @@ class BasicStatus extends React.Component {
       return;
     }
     let idx=this.state.pingResultCurrentIdx;
-    let url=this.state.pingResultSources[idx].url;
+    let url=this.props.pingResultSources[idx].url;
     this.requestIsInFlight = true;
     this.request.open("GET", url, true);
     this.request.send();
@@ -72,11 +70,46 @@ class BasicStatus extends React.Component {
     console.log("Theia restarted");
   }
 
+  generatePoolIndex(pingResultSources, pingResults) {
+    let poolIndex = {};
+    pingResultSources.forEach(pingResultSource => {
+      let srcId = pingResultSource.id;
+      if (srcId in pingResults && "ping_results" in pingResults[srcId]) {
+        pingResults[srcId]["ping_results"].forEach(poolResult => {
+          let publicKey = poolResult.publicKey;
+          if (!(publicKey in poolIndex)) {
+            poolIndex[publicKey] = {
+              "name": "unknown", 
+              "description": "", 
+              "homepage": "",
+              "address": "", 
+              "port": "",
+              "publicKey": "", 
+              "ticker": "",
+              "results": {}
+            };
+          }
+          if (typeof poolResult !== 'undefined') {
+            poolIndex[publicKey]["results"][srcId] = poolResult;
+            let fields = ["name", "description", "homepage", "address", "port", "publicKey", "ticker"];
+            fields.forEach( field => {
+              if (field in poolResult) {
+                poolIndex[publicKey][field] = poolResult[field];
+              }
+            });
+          }
+        });
+      };
+    });
+    //console.log(poolIndex);
+    return poolIndex;
+  }
+
   handleConnectionStateUpdate() {
     let idx=this.state.pingResultCurrentIdx;
-    let pingResultSource = this.state.pingResultSources[idx];
+    let pingResultSource = this.props.pingResultSources[idx];
     let nextIdx = idx + 1;
-    if (nextIdx >= this.state.pingResultSources.length) {
+    if (nextIdx >= this.props.pingResultSources.length) {
       nextIdx = 0;
     }
     //console.log("readyState = " + this.request.readyState + "  status = " + this.request.status);
@@ -98,19 +131,25 @@ class BasicStatus extends React.Component {
         pingResults[pingResultSource.id]=parsedResult;
         let update = { 
           "pingResultCurrentIdx": nextIdx,
-          "pingResults": pingResults
+          "pingResults": pingResults,
+          "poolIndex": this.generatePoolIndex(this.props.pingResultSources, pingResults)
         };
         this.setState(update);
       }
     }
   }
 
+  //<div key="debugHelper">Last Updated: {this.props.pingResultSources[this.state.pingResultCurrentIdx].id} {this.props.pingResultSources[this.state.pingResultCurrentIdx].name}</div>
   render() {
     return (
       <div>
-        <h1><img src={process.env.PUBLIC_URL + "/theia.png"} alt="Theia" />Theia</h1>
-        <Version />
-        <p>Result set {this.state.pingResultCurrentIdx}: {this.state.pingResultSources[this.state.pingResultCurrentIdx].url}</p>
+        <table><thead>
+          <ResultHeader pingResultSources={this.props.pingResultSources} />
+        </thead><tbody>
+          {Object.keys(this.state.poolIndex).sort().map(publicKey => (
+            <ResultRow key={"row_"+publicKey} pingResultSources={this.props.pingResultSources} publicKey={publicKey} pool={this.state.poolIndex[publicKey]} />
+          ))}
+        </tbody></table>
       </div>
     );
   }
