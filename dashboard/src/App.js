@@ -1,6 +1,8 @@
 import './App.css';
+import { BasicStatus } from './BasicStatus';
 
 function App() {
+  let result_urls = [ 'ping_results.json', 'ping_results.json' ]
   return (
     <div className="App">
       <header className="App-header">
@@ -16,6 +18,7 @@ function App() {
           Learn React
         </a>
       </header>
+      <BasicStatus results={result_urls} />
     </div>
   );
 }
