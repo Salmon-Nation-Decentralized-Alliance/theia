@@ -1,5 +1,8 @@
 .App {
 }
+th {
+  background-color: #F0F0F0;
+}
 th, td {
   padding-top: 4px;
   padding-bottom: 4px;

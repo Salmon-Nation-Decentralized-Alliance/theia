@@ -45,7 +45,7 @@ class ResultRow extends React.Component {
     let pool = this.props.pool;
     return (
       <tr>
-        <td key={"lead_"+publicKey}><a href={'https://pooltool.io/pool/'+publicKey+'/epochs'}>{pool["name"]}</a></td>
+        <th key={"lead_"+publicKey}><a href={'https://pooltool.io/pool/'+publicKey+'/epochs'}>{pool["name"]}</a></th>
         {pingResultSources.map( src => (
           <td key={"entry_"+src.id+"_"+publicKey}><font color={formatEntryColor(publicKey, pool, src)}>{formatEntryBody(publicKey, pool, src)}</font></td>
         ))}
