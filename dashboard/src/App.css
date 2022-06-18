@@ -1,7 +1,14 @@
 .App {
 }
 th, td {
-  padding: 8px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+table, th, td {
+  border: 1px solid lightgrey;
+  border-spacing: 0px;
 }
 
 
