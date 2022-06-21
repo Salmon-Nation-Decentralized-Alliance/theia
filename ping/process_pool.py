@@ -67,7 +67,14 @@ def validate_and_process_address(pool, port, addr_in):
     elif re_dns.match(addr) is not None:
         addresses = get_ip_from_dns(addr)
         for address in addresses:
-             hosts.append(make_relay(pool, port, address))
+            # Yes, addresses in DNS can be wrong, nonsensical, and need validation
+            if re_ipv4.match(addr) is not None:
+                hosts.append(make_relay(pool, port, address))
+            elif re_ipv6.match(addr) is not None:
+                hosts.append(make_relay(pool, port, address))
+            else
+                # TODO: record this DNS error in error.json
+                pass
     return hosts
 
 def process_relay(pool, relay):
